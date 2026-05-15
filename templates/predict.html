@@ -1,0 +1,389 @@
+{% extends "base.html" %}
+{% block title %}智能检测 - 阿尔兹海默症预测系统{% endblock %}
+{% block content %}
+
+<!-- 页面标题 -->
+<section class="py-8 bg-base-200">
+    <div class="container mx-auto px-4">
+        <div class="text-center">
+            <h1 class="text-4xl font-bold mb-4">
+                <i class="fas fa-brain text-primary mr-3"></i>
+                阿尔兹海默症智能检测
+            </h1>
+            <p class="text-lg text-base-content/70">
+                基于31项临床指标的机器学习预测分析
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- 主要内容区域 -->
+<section class="py-12">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- 左侧：输入表单 -->
+            <div class="lg:col-span-2">
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h2 class="card-title text-2xl mb-6">
+                            <i class="fas fa-clipboard-list text-primary mr-2"></i>
+                            患者信息录入
+                        </h2>
+                        <form id="prediction-form" class="space-y-6">
+                            <!-- 基本信息 -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">年龄</span>
+                                    </label>
+                                    <input type="number" name="Age" min="60" max="90" required class="input input-bordered" placeholder="60-90岁">
+                                </div>
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">性别</span>
+                                    </label>
+                                    <select name="Gender" class="select select-bordered" required>
+                                        <option value="">请选择</option>
+                                        <option value="0">男性</option>
+                                        <option value="1">女性</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">种族</span>
+                                    </label>
+                                    <!-- 修改1: 种族选项的值改为数字 -->
+                                    <select name="Ethnicity" class="select select-bordered" required>
+                                        <option value="">请选择</option>
+                                        <option value="0">高加索人</option>
+                                        <option value="1">非裔美国人</option>
+                                        <option value="2">亚洲人</option>
+                                        <option value="3">其他</option>
+                                    </select>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">教育水平</span>
+                                    </label>
+                                    <input type="number" name="EducationLevel" min="0" max="20" required class="input input-bordered" placeholder="受教育年限">
+                                </div>
+                            </div>
+
+                            <!-- 生理指标 -->
+                            <div class="divider">生理指标</div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">BMI</span>
+                                    </label>
+                                    <input type="number" name="BMI" min="15" max="40" step="0.1" required class="input input-bordered" placeholder="15-40">
+                                </div>
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">收缩压</span>
+                                    </label>
+                                    <input type="number" name="SystolicBP" min="90" max="180" required class="input input-bordered" placeholder="90-180 mmHg">
+                                </div>
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">舒张压</span>
+                                    </label>
+                                    <input type="number" name="DiastolicBP" min="60" max="120" required class="input input-bordered" placeholder="60-120 mmHg">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">总胆固醇</span>
+                                    </label>
+                                    <input type="number" name="CholesterolTotal" min="150" max="300" required class="input input-bordered" placeholder="150-300 mg/dL">
+                                </div>
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">LDL胆固醇</span>
+                                    </label>
+                                    <input type="number" name="CholesterolLDL" min="50" max="200" required class="input input-bordered" placeholder="50-200 mg/dL">
+                                </div>
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">HDL胆固醇</span>
+                                    </label>
+                                    <input type="number" name="CholesterolHDL" min="20" max="100" required class="input input-bordered" placeholder="20-100 mg/dL">
+                                </div>
+                            </div>
+
+                            <!-- 认知功能评估 -->
+                            <div class="divider">认知功能评估</div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">MMSE得分</span>
+                                    </label>
+                                    <input type="number" name="MMSE" min="0" max="30" required class="input input-bordered" placeholder="0-30分">
+                                </div>
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">功能评估得分</span>
+                                    </label>
+                                    <input type="number" name="FunctionalAssessment" min="0" max="10" step="0.1" required class="input input-bordered" placeholder="0-10分">
+                                </div>
+                            </div>
+
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text font-semibold">日常生活活动(ADL)得分</span>
+                                </label>
+                                <input type="number" name="ADL" min="0" max="10" step="0.1" required class="input input-bordered" placeholder="0-10分">
+                            </div>
+
+                            <!-- 生活习惯 -->
+                            <div class="divider">生活习惯</div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">吸烟状况</span>
+                                    </label>
+                                    <select name="Smoking" class="select select-bordered" required>
+                                        <option value="">请选择</option>
+                                        <option value="1">吸烟</option>
+                                        <option value="0">不吸烟</option>
+                                    </select>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">酒精摄入量</span>
+                                    </label>
+                                    <input type="number" name="AlcoholConsumption" min="0" max="20" step="0.1" required class="input input-bordered" placeholder="0-20单位/周">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">体育活动时间</span>
+                                    </label>
+                                    <input type="number" name="PhysicalActivity" min="0" max="10" step="0.1" required class="input input-bordered" placeholder="0-10小时/周">
+                                </div>
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">饮食质量评分</span>
+                                    </label>
+                                    <input type="number" name="DietQuality" min="0" max="10" step="0.1" required class="input input-bordered" placeholder="0-10分">
+                                </div>
+                                <div class="form-control">
+                                    <label class="label">
+                                        <span class="label-text font-semibold">睡眠质量评分</span>
+                                    </label>
+                                    <input type="number" name="SleepQuality" min="4" max="10" step="0.1" required class="input input-bordered" placeholder="4-10分">
+                                </div>
+                            </div>
+
+                            <!-- 病史 -->
+                            <div class="divider">病史记录</div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div class="form-control">
+                                    <label class="label cursor-pointer">
+                                        <span class="label-text">家族阿尔兹海默病史</span>
+                                        <input type="checkbox" name="FamilyHistoryAlzheimers" value="1" class="checkbox checkbox-primary">
+                                    </label>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label cursor-pointer">
+                                        <span class="label-text">心血管疾病</span>
+                                        <input type="checkbox" name="CardiovascularDisease" value="1" class="checkbox checkbox-primary">
+                                    </label>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label cursor-pointer">
+                                        <span class="label-text">糖尿病</span>
+                                        <input type="checkbox" name="Diabetes" value="1" class="checkbox checkbox-primary">
+                                    </label>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label cursor-pointer">
+                                        <span class="label-text">抑郁症史</span>
+                                        <input type="checkbox" name="Depression" value="1" class="checkbox checkbox-primary">
+                                    </label>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label cursor-pointer">
+                                        <span class="label-text">头部受伤</span>
+                                        <input type="checkbox" name="HeadInjury" value="1" class="checkbox checkbox-primary">
+                                    </label>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label cursor-pointer">
+                                        <span class="label-text">高血压</span>
+                                        <input type="checkbox" name="Hypertension" value="1" class="checkbox checkbox-primary">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- 症状评估 -->
+                            <div class="divider">症状评估</div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div class="form-control">
+                                    <label class="label cursor-pointer">
+                                        <span class="label-text">记忆抱怨</span>
+                                        <input type="checkbox" name="MemoryComplaints" value="1" class="checkbox checkbox-primary">
+                                    </label>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label cursor-pointer">
+                                        <span class="label-text">行为问题</span>
+                                        <input type="checkbox" name="BehavioralProblems" value="1" class="checkbox checkbox-primary">
+                                    </label>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label cursor-pointer">
+                                        <span class="label-text">混乱与定向障碍</span>
+                                        <input type="checkbox" name="Confusion" value="1" class="checkbox checkbox-primary">
+                                    </label>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label cursor-pointer">
+                                        <span class="label-text">人格变化</span>
+                                        <input type="checkbox" name="PersonalityChanges" value="1" class="checkbox checkbox-primary">
+                                    </label>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label cursor-pointer">
+                                        <span class="label-text">完成任务困难</span>
+                                        <input type="checkbox" name="DifficultyCompletingTasks" value="1" class="checkbox checkbox-primary">
+                                    </label>
+                                </div>
+                                <div class="form-control">
+                                    <label class="label cursor-pointer">
+                                        <span class="label-text">健忘</span>
+                                        <input type="checkbox" name="Forgetfulness" value="1" class="checkbox checkbox-primary">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- 提交按钮 -->
+                            <div class="card-actions justify-end mt-8">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-search mr-2"></i>
+                                    开始预测分析
+                                </button>
+                                <button type="reset" class="btn btn-outline">
+                                    <i class="fas fa-undo mr-2"></i>
+                                    重置表单
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：预测结果 -->
+            <div class="lg:col-span-1">
+                <div class="card bg-base-100 shadow-xl sticky top-4">
+                    <div class="card-body">
+                        <h2 class="card-title text-xl mb-4">
+                            <i class="fas fa-chart-bar text-primary mr-2"></i>
+                            预测结果
+                        </h2>
+                        <div id="prediction-result" class="text-center py-8">
+                            <i class="fas fa-stethoscope text-6xl text-gray-300 mb-4"></i>
+                            <p class="text-gray-500">请填写左侧表单并提交预测</p>
+                        </div>
+                        <div id="result-details" class="hidden">
+                            <!-- 结果将在这里动态显示 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 加载动画 -->
+<div id="loading-spinner" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="loading loading-spinner loading-lg text-primary"></div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // 表单提交处理
+    document.getElementById('prediction-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        // 显示加载动画
+        document.getElementById('loading-spinner').classList.remove('hidden');
+
+        try {
+            // 收集表单数据
+            const formData = new FormData(this);
+            const data = {}
+
+            // 处理数值型数据
+            const numericFields = [
+                'Age', 'EducationLevel', 'BMI', 'AlcoholConsumption',
+                'PhysicalActivity', 'DietQuality', 'SleepQuality',
+                'SystolicBP', 'DiastolicBP', 'CholesterolTotal',
+                'CholesterolLDL', 'CholesterolHDL', 'MMSE',
+                'FunctionalAssessment', 'ADL'
+            ];
+            numericFields.forEach(field => {
+                data[field] = parseFloat(formData.get(field)) || 0;
+            });
+
+            // 处理分类型数据
+            data['Gender'] = parseInt(formData.get('Gender'));
+            // 修改2: 将种族值转换为数字
+            data['Ethnicity'] = parseInt(formData.get('Ethnicity')) || 0;  // 关键修改
+
+            // 处理二值型数据
+            const binaryFields = [
+                'Smoking', 'FamilyHistoryAlzheimers', 'CardiovascularDisease',
+                'Diabetes', 'Depression', 'HeadInjury', 'Hypertension',
+                'MemoryComplaints', 'BehavioralProblems', 'Confusion',
+                'PersonalityChanges', 'DifficultyCompletingTasks', 'Forgetfulness'
+            ];
+            binaryFields.forEach(field => {
+                data[field] = formData.get(field) ? 1 : 0;
+            });
+
+            // 发送预测请求
+            const response = await fetch('/api/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            });
+
+            const result = await response.json();
+
+            // 显示预测结果
+            displayPredictionResult(result);
+        } catch (error) {
+            console.error('预测失败:', error);
+            alert('预测失败，请稍稍后重试'); } finally {
+            // 隐藏加载动画
+    document.getElementById('loading-spinner').classList.add('hidden'); } });
+    // 显示预测结果
+    function displayPredictionResult(result) { const resultDiv = document.getElementById('prediction-result'); const detailsDiv = document.getElementById('result-details');
+        // 清空之前的结果
+    resultDiv.innerHTML = ''; detailsDiv.innerHTML = '';
+    // 根据预测结果显示不同的样式
+    const isHighRisk = result.prediction === 1;
+    const riskLevel = isHighRisk ? '高风险' : '低风险'; const riskColor = isHighRisk ? 'text-red-500' : 'text-green-500'; const riskIcon = isHighRisk ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle';
+    // 结果卡片
+    resultDiv.innerHTML = ` <div class="text-center"> <i class="${riskIcon} text-6xl ${riskColor} mb-4"></i> <h3 class="text-2xl font-bold mb-2 ${riskColor}">${riskLevel}</h3> <p class="text-lg text-gray-600 mb-4"> 患病概率: <span class="font-bold">${(result.probability * 100).toFixed(1)}%</span> </p> <div class="radial-progress ${isHighRisk ? 'text-red-500' : 'text-green-500'}" style="--value: ${result.probability * 100}; --size: 8rem; --thickness: 0.5rem;"> ${(result.probability * 100).toFixed(0)}% </div> </div> `;
+    // 详细分析
+    let detailsHTML = ` <div class="mt-6 space-y-4"> <h4 class="font-bold text-lg">关键指标分析</h4> `;
+    // 显示最重要的3个特征
+    if (result.feature_importance) { const topFeatures = result.feature_importance.slice(0, 3); topFeatures.forEach(feature => { detailsHTML += ` <div class="flex justify-between items-center p-3 bg-base-200 rounded-lg"> <span class="font-medium">${feature.feature}</span> <span class="text-sm text-gray-600">重要性: ${feature.importance.toFixed(3)}</span> </div> `; }); }
+    // 建议
+    detailsHTML += ` <div class="alert alert-info"> <i class="fas fa-info-circle"></i> <span> ${isHighRisk ? '建议：请尽快咨询专业医生进行进一步检查和诊断。' : '建议：继续保持健康的生活方式，定期体检。' } </span> </div> `; detailsHTML += '</div>'; detailsDiv.innerHTML = detailsHTML;
+        // 显示详情区域
+    detailsDiv.classList.remove('hidden'); }
+</script> {% endblock %}

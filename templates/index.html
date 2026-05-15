@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+
+{% block title %}首页 - 阿尔兹海默症智能分析预测系统{% endblock %}
+
+{% block content %}
+<!-- 英雄区域 -->
+<section class="hero gradient-bg min-h-[60vh]">
+    <div class="hero-content text-center text-white">
+        <div class="max-w-4xl">
+            <i class="fas fa-brain text-6xl mb-6 opacity-80"></i>
+            <h1 class="text-5xl md:text-6xl font-bold mb-6">
+                阿尔兹海默症
+                <br>
+                <span class="text-yellow-300">智能预测系统</span>
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 opacity-90">
+                基于XGBoost机器学习技术，实现97.9%的预测准确率
+                <br>
+                为早期识别和干预提供科学依据
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/predict" class="btn btn-primary btn-lg">
+                    <i class="fas fa-stethoscope mr-2"></i>
+                    开始智能检测
+                </a>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 系统特色 -->
+<section class="py-16 bg-base-100">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold mb-4">系统特色</h2>
+            <p class="text-lg text-base-content/70">基于先进机器学习技术的医疗辅助诊断系统</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- 高精度预测 -->
+            <div class="card bg-base-100 shadow-xl card-hover">
+                <div class="card-body text-center">
+                    <div class="text-6xl mb-4 feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3 class="card-title justify-center text-2xl mb-2">高精度预测</h3>
+                    <p class="text-base-content/70">基于XGBoost算法，测试集AUC达到97.9%，提供可靠的预测结果</p>
+                </div>
+            </div>
+            
+            <!-- 全面分析 -->
+            <div class="card bg-base-100 shadow-xl card-hover">
+                <div class="card-body text-center">
+                    <div class="text-6xl mb-4 feature-icon">
+                        <i class="fas fa-microscope"></i>
+                    </div>
+                    <h3 class="card-title justify-center text-2xl mb-2">全面分析</h3>
+                    <p class="text-base-content/70">整合31项临床指标，包括认知功能、生活习惯、生物标志物等</p>
+                </div>
+            </div>
+            
+            <!-- 实时诊断 -->
+            <div class="card bg-base-100 shadow-xl card-hover">
+                <div class="card-body text-center">
+                    <div class="text-6xl mb-4 feature-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3 class="card-title justify-center text-2xl mb-2">实时诊断</h3>
+                    <p class="text-base-content/70">Web端即时预测，支持移动端访问，随时随地获取专业建议</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 数据统计 -->
+<section class="py-16 bg-base-200">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold mb-4">数据统计</h2>
+            <p class="text-lg text-base-content/70">基于真实临床数据的分析结果</p>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="stat bg-base-100 rounded-lg p-6 shadow-lg">
+                <div class="stat-figure text-primary">
+                    <i class="fas fa-users text-3xl"></i>
+                </div>
+                <div class="stat-title">总患者数</div>
+                <div class="stat-value text-primary" id="total-patients">-</div>
+                <div class="stat-desc">临床数据样本</div>
+            </div>
+            
+            <div class="stat bg-base-100 rounded-lg p-6 shadow-lg">
+                <div class="stat-figure text-secondary">
+                    <i class="fas fa-percentage text-3xl"></i>
+                </div>
+                <div class="stat-title">患病率</div>
+                <div class="stat-value text-secondary" id="positive-rate">-</div>
+                <div class="stat-desc">确诊比例</div>
+            </div>
+            
+            <div class="stat bg-base-100 rounded-lg p-6 shadow-lg">
+                <div class="stat-figure text-accent">
+                    <i class="fas fa-venus-mars text-3xl"></i>
+                </div>
+                <div class="stat-title">性别分布</div>
+                <div class="stat-value text-accent" id="gender-distribution">-</div>
+                <div class="stat-desc">男女比例</div>
+            </div>
+            
+            <div class="stat bg-base-100 rounded-lg p-6 shadow-lg">
+                <div class="stat-figure text-warning">
+                    <i class="fas fa-birthday-cake text-3xl"></i>
+                </div>
+                <div class="stat-title">平均年龄</div>
+                <div class="stat-value text-warning" id="avg-age">-</div>
+                <div class="stat-desc">患者年龄</div>
+            </div>
+        </div>
+        
+        <!-- 图表区域 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+            <h3 class="card-title">诊断分布</h3>
+            <div style="height: 300px; position: relative;">
+                <canvas id="diagnosis-chart"></canvas>
+            </div>
+        </div>
+            </div>
+            
+            <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h3 class="card-title">年龄分布</h3>
+            <div style="height: 300px; position: relative;">
+                <canvas id="age-chart"></canvas>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</section>
+
+<!-- 技术流程 -->
+<section class="py-16 bg-base-100">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold mb-4">技术实现流程</h2>
+            <p class="text-lg text-base-content/70">完整的机器学习项目开发流程</p>
+        </div>
+        
+        <div class="w-full">
+            <ul class="steps steps-vertical lg:steps-horizontal">
+                <li class="step step-primary">
+                    <div class="step-content">
+                        <h4 class="font-bold">数据收集</h4>
+                        <p class="text-sm">收集2149名患者的临床数据</p>
+                    </div>
+                </li>
+                <li class="step step-primary">
+                    <div class="step-content">
+                        <h4 class="font-bold">数据预处理</h4>
+                        <p class="text-sm">清洗、标准化、特征工程</p>
+                    </div>
+                </li>
+                <li class="step step-primary">
+                    <div class="step-content">
+                        <h4 class="font-bold">模型训练</h4>
+                        <p class="text-sm">XGBoost算法优化训练</p>
+                    </div>
+                </li>
+                <li class="step step-primary">
+                    <div class="step-content">
+                        <h4 class="font-bold">模型评估</h4>
+                        <p class="text-sm">AUC 97.9%验证模型性能</p>
+                    </div>
+                </li>
+                <li class="step step-primary">
+                    <div class="step-content">
+                        <h4 class="font-bold">系统部署</h4>
+                        <p class="text-sm">Flask Web应用上线</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<!-- 加载动画 -->
+<div id="loading-spinner" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="loading loading-spinner loading-lg text-primary"></div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// 加载统计数据
+async function loadStatistics() {
+    try {
+        const response = await fetch('/api/statistics');
+        const data = await response.json();
+        
+        // 更新统计卡片
+        document.getElementById('total-patients').textContent = data.total_patients;
+        document.getElementById('positive-rate').textContent = data.diagnosis_distribution.positive_rate + '%';
+        document.getElementById('gender-distribution').textContent = 
+            `${data.gender_distribution.male}:${data.gender_distribution.female}`;
+        document.getElementById('avg-age').textContent = data.age_statistics.mean + '岁';
+        
+        // 绘制诊断分布图
+        const diagnosisCtx = document.getElementById('diagnosis-chart').getContext('2d');
+        new Chart(diagnosisCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['确诊', '未确诊'],
+                datasets: [{
+                    data: [
+                        data.diagnosis_distribution.positive,
+                        data.diagnosis_distribution.negative
+                    ],
+                    backgroundColor: ['#ef4444', '#22c55e']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                 devicePixelRatio: 2,
+            }
+        });
+        const ageCtx = document.getElementById('age-chart').getContext('2d');
+        new Chart(ageCtx, {
+            type: 'bar',
+            data: {
+                labels: Object.keys(data.age_distribution),
+                datasets: [{
+                    label: '患者数',
+                    data: Object.values(data.age_distribution),
+                    backgroundColor: '#3b82f6',
+                    borderColor: '#2563eb',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '人数'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: '年龄段'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('加载统计数据失败:', error);
+    }
+}
+
+// 页面加载完成后执行
+document.addEventListener('DOMContentLoaded', loadStatistics);
+</script>
+{% endblock %}
