@@ -143,6 +143,51 @@
     </div>
 </section>
 
+<!-- 模型评估 -->
+<section class="py-16 bg-base-100">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold mb-4">模型评估</h2>
+            <p class="text-lg text-base-content/70">XGBoost模型的性能评估结果</p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- ROC曲线 -->
+            <div class="card bg-base-200 rounded-lg shadow-lg overflow-hidden">
+                <div class="card-body p-4">
+                    <div class="flex justify-center">
+                        <img src="/static/images/roc_curve.png" alt="ROC曲线" class="rounded-lg shadow-lg max-w-full max-h-80 object-contain">
+                    </div>
+                    <h3 class="card-title mt-4 text-center">ROC曲线</h3>
+                    <p class="text-sm text-center text-base-content/70">展示模型在不同阈值下的真正率与假正率，AUC值越高表示模型性能越好</p>
+                </div>
+            </div>
+            
+            <!-- 混淆矩阵 -->
+            <div class="card bg-base-200 rounded-lg shadow-lg overflow-hidden">
+                <div class="card-body p-4">
+                    <div class="flex justify-center">
+                        <img src="/static/images/confusion_matrix.png" alt="混淆矩阵" class="rounded-lg shadow-lg max-w-full max-h-80 object-contain">
+                    </div>
+                    <h3 class="card-title mt-4 text-center">混淆矩阵</h3>
+                    <p class="text-sm text-center text-base-content/70">展示模型预测结果与真实标签的对比，包含真正例、假正例、真负例、假负例</p>
+                </div>
+            </div>
+            
+            <!-- 特征重要性 -->
+            <div class="card bg-base-200 rounded-lg shadow-lg overflow-hidden">
+                <div class="card-body p-4">
+                    <div class="flex justify-center">
+                        <img src="/static/images/feature_importance.png" alt="特征重要性" class="rounded-lg shadow-lg max-w-full max-h-80 object-contain">
+                    </div>
+                    <h3 class="card-title mt-4 text-center">特征重要性</h3>
+                    <p class="text-sm text-center text-base-content/70">展示各特征对模型预测的重要程度，帮助理解模型决策过程</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- 技术流程 -->
 <section class="py-16 bg-base-100">
     <div class="container mx-auto px-4">

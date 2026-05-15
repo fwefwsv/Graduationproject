@@ -370,20 +370,133 @@
             // 隐藏加载动画
     document.getElementById('loading-spinner').classList.add('hidden'); } });
     // 显示预测结果
-    function displayPredictionResult(result) { const resultDiv = document.getElementById('prediction-result'); const detailsDiv = document.getElementById('result-details');
+    function displayPredictionResult(result) {
+        const resultDiv = document.getElementById('prediction-result');
+        const detailsDiv = document.getElementById('result-details');
+        
         // 清空之前的结果
-    resultDiv.innerHTML = ''; detailsDiv.innerHTML = '';
-    // 根据预测结果显示不同的样式
-    const isHighRisk = result.prediction === 1;
-    const riskLevel = isHighRisk ? '高风险' : '低风险'; const riskColor = isHighRisk ? 'text-red-500' : 'text-green-500'; const riskIcon = isHighRisk ? 'fas fa-exclamation-triangle' : 'fas fa-check-circle';
-    // 结果卡片
-    resultDiv.innerHTML = ` <div class="text-center"> <i class="${riskIcon} text-6xl ${riskColor} mb-4"></i> <h3 class="text-2xl font-bold mb-2 ${riskColor}">${riskLevel}</h3> <p class="text-lg text-gray-600 mb-4"> 患病概率: <span class="font-bold">${(result.probability * 100).toFixed(1)}%</span> </p> <div class="radial-progress ${isHighRisk ? 'text-red-500' : 'text-green-500'}" style="--value: ${result.probability * 100}; --size: 8rem; --thickness: 0.5rem;"> ${(result.probability * 100).toFixed(0)}% </div> </div> `;
-    // 详细分析
-    let detailsHTML = ` <div class="mt-6 space-y-4"> <h4 class="font-bold text-lg">关键指标分析</h4> `;
-    // 显示最重要的3个特征
-    if (result.feature_importance) { const topFeatures = result.feature_importance.slice(0, 3); topFeatures.forEach(feature => { detailsHTML += ` <div class="flex justify-between items-center p-3 bg-base-200 rounded-lg"> <span class="font-medium">${feature.feature}</span> <span class="text-sm text-gray-600">重要性: ${feature.importance.toFixed(3)}</span> </div> `; }); }
-    // 建议
-    detailsHTML += ` <div class="alert alert-info"> <i class="fas fa-info-circle"></i> <span> ${isHighRisk ? '建议：请尽快咨询专业医生进行进一步检查和诊断。' : '建议：继续保持健康的生活方式，定期体检。' } </span> </div> `; detailsHTML += '</div>'; detailsDiv.innerHTML = detailsHTML;
+        resultDiv.innerHTML = '';
+        detailsDiv.innerHTML = '';
+        
+        // 直接使用后端返回的风险等级
+        const riskLevel = result.risk_level;
+        
+        // 根据风险等级确定样式类和图标
+        let textColorClass = 'text-green-500';
+        let iconClass = 'fas fa-check-circle';
+        
+        if (riskLevel === '高风险') {
+            textColorClass = 'text-red-500';
+            iconClass = 'fas fa-exclamation-triangle';
+        } else if (riskLevel === '中等风险') {
+            textColorClass = 'text-yellow-500';
+            iconClass = 'fas fa-exclamation-circle';
+        }
+        
+        // 结果卡片
+        resultDiv.innerHTML = `
+            <div class="text-center">
+                <i class="${iconClass} text-6xl ${textColorClass} mb-4"></i>
+                <h3 class="text-2xl font-bold mb-2 ${textColorClass}">${riskLevel}</h3>
+                <p class="text-lg text-gray-600 mb-4">
+                    患病概率: <span class="font-bold">${(result.probability * 100).toFixed(1)}%</span>
+                </p>
+                <div class="radial-progress ${textColorClass}" style="--value: ${result.probability * 100}; --size: 8rem; --thickness: 0.5rem;">
+                    ${(result.probability * 100).toFixed(0)}%
+                </div>
+                <button id="download-report-btn" class="mt-6 btn btn-primary" onclick="downloadReport()">
+                    <i class="fas fa-download"></i> 下载诊断报告
+                </button>
+            </div>
+        `;
+        
+        // 详细分析
+        let detailsHTML = `
+            <div class="mt-6 space-y-4">
+                <h4 class="font-bold text-lg">关键指标分析</h4>
+        `;
+        
+        // 显示最重要的3个特征
+        if (result.feature_importance) {
+            const topFeatures = result.feature_importance.slice(0, 3);
+            topFeatures.forEach(feature => {
+                detailsHTML += `
+                    <div class="flex justify-between items-center p-3 bg-base-200 rounded-lg">
+                        <span class="font-medium">${feature.feature}</span>
+                        <span class="text-sm text-gray-600">重要性: ${feature.importance.toFixed(3)}</span>
+                    </div>
+                `;
+            });
+        }
+        
+        // 建议
+        let advice = '';
+        if (riskLevel === '高风险') {
+            advice = '建议：请尽快咨询专业医生进行进一步检查和诊断。';
+        } else if (riskLevel === '中等风险') {
+            advice = '建议：建议定期监测健康状况，如有疑虑请咨询医生。';
+        } else {
+            advice = '建议：继续保持健康的生活方式，定期体检。';
+        }
+        
+        detailsHTML += `
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <span>${advice}</span>
+            </div>
+        `;
+        detailsHTML += '</div>';
+        detailsDiv.innerHTML = detailsHTML;
+        
         // 显示详情区域
-    detailsDiv.classList.remove('hidden'); }
+        detailsDiv.classList.remove('hidden');
+    }
+    
+    // 下载诊断报告
+    function downloadReport() {
+        const downloadBtn = document.getElementById('download-report-btn');
+        downloadBtn.disabled = true;
+        downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成中...';
+        
+        // 获取表单数据
+        const formData = new FormData(document.getElementById('prediction-form'));
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+        
+        // 发送请求生成PDF
+        fetch('/api/report', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('生成报告失败');
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            // 创建下载链接
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `诊断报告_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        })
+        .catch(error => {
+            console.error('下载报告失败:', error);
+            alert('下载报告失败，请稍后重试');
+        })
+        .finally(() => {
+            downloadBtn.disabled = false;
+            downloadBtn.innerHTML = '<i class="fas fa-download"></i> 下载诊断报告';
+        });
+    }
 </script> {% endblock %}
