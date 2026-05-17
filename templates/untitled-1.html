@@ -1,0 +1,161 @@
+<!-- E:\冯正宇\下载\project\fUKSk2futOFD0POu9JBy-master-c3c5cbd93c8a24e6c33d03ecd9679df8f20f50cb\templates\index.html -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阿尔兹海默症智能分析系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'SimHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .main {
+            text-align: center;
+            color: white;
+        }
+
+        .logo {
+            font-size: 72px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        p {
+            font-size: 20px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 16px 40px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .features {
+            margin-top: 60px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .feature-card {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card i {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 32px;
+            }
+
+            .nav-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div class="logo">🧠</div>
+        <h1>阿尔兹海默症智能分析系统</h1>
+        <p>基于XGBoost的机器学习预测平台</p>
+        
+        <div class="nav-buttons">
+            <a href="/predict" class="btn">🔮 开始预测</a>
+            <a href="/visualization" class="btn btn-secondary">📊 数据可视化</a>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div>🎯</div>
+                <h3>精准预测</h3>
+                <p>基于XGBoost算法，提供高精度的阿尔兹海默症风险预测</p>
+            </div>
+            <div class="feature-card">
+                <div>📈</div>
+                <h3>数据可视化</h3>
+                <p>丰富的数据图表展示，直观了解数据特征和模型性能</p>
+            </div>
+            <div class="feature-card">
+                <div>📝</div>
+                <h3>智能报告</h3>
+                <p>自动生成专业的诊断报告，支持PDF下载</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

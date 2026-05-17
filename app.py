@@ -54,6 +54,44 @@ def predict_page():
     """预测页面"""
     return render_template('predict.html')
 
+@app.route('/visualization')
+def visualization_page():
+    """可视化页面 - 展示数据分析图表"""
+    # 获取static/images目录下的所有图片
+    import glob
+    image_dir = 'static/images'
+    image_files = glob.glob(f'{image_dir}/*.png')
+    
+    # 提取文件名，用于展示
+    images = []
+    for img_path in image_files:
+        filename = img_path.replace('\\', '/').split('/')[-1]
+        # 根据文件名生成友好的标题
+        title_mapping = {
+            'diagnosis_distribution.png': '诊断状态分布',
+            'age_distribution.png': '年龄分布',
+            'correlation_heatmap.png': '特征相关性热力图',
+            'feature_distributions.png': '重要特征分布',
+            'age_stacked_histogram.png': '年龄分布堆叠图',
+            'gender_diagnosis_bar.png': '性别与诊断状态分布',
+            'ethnicity_diagnosis_bar.png': '种族与诊断状态分布',
+            'roc_curve.png': 'ROC曲线',
+            'confusion_matrix.png': '混淆矩阵',
+            'feature_importance.png': '特征重要性',
+            'model_comparison.png': '模型性能对比',
+            'xgboost_algorithm.png': 'XGBoost算法原理',
+            'objective_function.png': '目标函数组成',
+            'gradient_boosting.png': '梯度提升过程'
+        }
+        title = title_mapping.get(filename, filename.replace('.png', '').replace('_', ' '))
+        images.append({
+            'path': f'/static/images/{filename}',
+            'title': title,
+            'filename': filename
+        })
+    
+    return render_template('visualization.html', images=images)
+
 
 @app.route('/api/predict', methods=['POST'])
 def predict():
@@ -545,6 +583,24 @@ def get_features():
 def static_files(filename):
     """提供静态文件"""
     return send_from_directory('static', filename)
+
+@app.route('/api/images')
+def get_images():
+    """获取所有图片列表"""
+    import glob
+    image_dir = 'static/images'
+    image_files = glob.glob(f'{image_dir}/*.png')
+    
+    images = []
+    for img_path in image_files:
+        filename = img_path.replace('\\', '/').split('/')[-1]
+        images.append({
+            'filename': filename,
+            'url': f'/static/images/{filename}'
+        })
+    
+    return jsonify({'images': images})
+
 
 @app.errorhandler(404)
 def not_found(error):
