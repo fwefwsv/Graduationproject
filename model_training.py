@@ -233,10 +233,12 @@ def perform_eda(df):
 
     # 2. 年龄分布
     plt.figure(figsize=(12, 6))
-    df.boxplot(column='年龄', by='诊断状态', ax=plt.gca())
+    ax = df.boxplot(column='年龄', by='诊断状态')
     plt.title('年龄与阿尔兹海默症诊断状态的关系')
     plt.suptitle('')
     plt.ylabel('年龄')
+    plt.xlabel('诊断状态')
+    ax.set_xticklabels(['正常', '阿尔兹海默症'])
     plt.savefig('static/images/age_distribution.png', dpi=300, bbox_inches='tight')
     plt.close()
 
