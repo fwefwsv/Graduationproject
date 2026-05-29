@@ -30,7 +30,10 @@ def baseline_comparison(xgboost_model, X_train_balanced, y_train_balanced, X_tes
     """
     基线模型对比实验
     对比AdaBoost、Gradient Boosting、Logistic Regression、SVM和XGBoost的性能
+    使用AUC、准确率和F1-score三个评价指标
     """
+    from sklearn.metrics import accuracy_score, f1_score
+    
     print("\n" + "=" * 60)
     print("基线模型对比实验")
     print("=" * 60)
@@ -43,54 +46,78 @@ def baseline_comparison(xgboost_model, X_train_balanced, y_train_balanced, X_tes
         'SVM': SVC(probability=True, random_state=42)
     }
 
-    # 存储各模型的AUC结果
-    results = {}
+    # 存储各模型的评估结果（AUC、准确率、F1-score）
+    results = {
+        'AUC': {},
+        'Accuracy': {},
+        'F1-score': {}
+    }
 
     # 训练并评估XGBoost模型（已传入）
     print("正在评估XGBoost模型...")
     dtest = xgb.DMatrix(X_test, label=y_test, feature_names=X_test.columns.tolist())
-    xgb_pred = xgboost_model.predict(dtest)
-    xgb_auc = roc_auc_score(y_test, xgb_pred)
-    results['XGBoost'] = xgb_auc
-    print(f"XGBoost AUC: {xgb_auc:.4f}")
+    xgb_pred_proba = xgboost_model.predict(dtest)
+    xgb_pred = (xgb_pred_proba > 0.5).astype(int)
+    
+    xgb_auc = roc_auc_score(y_test, xgb_pred_proba)
+    xgb_acc = accuracy_score(y_test, xgb_pred)
+    xgb_f1 = f1_score(y_test, xgb_pred)
+    
+    results['AUC']['XGBoost'] = xgb_auc
+    results['Accuracy']['XGBoost'] = xgb_acc
+    results['F1-score']['XGBoost'] = xgb_f1
+    
+    print(f"XGBoost - AUC: {xgb_auc:.4f}, Accuracy: {xgb_acc:.4f}, F1-score: {xgb_f1:.4f}")
 
     # 训练并评估基线模型
     for name, model in models.items():
         print(f"\n正在训练{name}...")
         model.fit(X_train_balanced, y_train_balanced)
         y_pred_proba = model.predict_proba(X_test)[:, 1]
+        y_pred = model.predict(X_test)
+        
         auc = roc_auc_score(y_test, y_pred_proba)
-        results[name] = auc
-        print(f"{name} AUC: {auc:.4f}")
+        acc = accuracy_score(y_test, y_pred)
+        f1 = f1_score(y_test, y_pred)
+        
+        results['AUC'][name] = auc
+        results['Accuracy'][name] = acc
+        results['F1-score'][name] = f1
+        
+        print(f"{name} - AUC: {auc:.4f}, Accuracy: {acc:.4f}, F1-score: {f1:.4f}")
 
     # 打印对比表格
     print("\n" + "=" * 60)
     print("模型性能对比表")
     print("=" * 60)
-    print(f"{'模型名称':<20} {'测试集AUC':<15}")
-    print("-" * 35)
-    for name, auc in sorted(results.items(), key=lambda x: x[1], reverse=True):
-        print(f"{name:<20} {auc:<15.4f}")
+    print(f"{'模型名称':<20} {'AUC':<10} {'准确率':<10} {'F1-score':<10}")
+    print("-" * 50)
+    all_models = list(results['AUC'].keys())
+    for name in sorted(all_models, key=lambda x: results['AUC'][x], reverse=True):
+        print(f"{name:<20} {results['AUC'][name]:<10.4f} {results['Accuracy'][name]:<10.4f} {results['F1-score'][name]:<10.4f}")
     print("=" * 60)
 
-    # 绘制柱状图
-    plt.figure(figsize=(10, 6))
-    sorted_results = sorted(results.items(), key=lambda x: x[1], reverse=True)
-    models_names = [item[0] for item in sorted_results]
-    auc_scores = [item[1] for item in sorted_results]
-    colors = ['#1f77b4'] + ['#7f7f7f'] * (len(models_names) - 1)  # XGBoost用蓝色，其他用灰色
-
-    sns.barplot(x=auc_scores, y=models_names, palette=colors)
-    plt.xlabel('AUC分数')
-    plt.ylabel('模型名称')
-    plt.title('各模型测试集AUC对比')
-    plt.xlim(0.5, 1.0)
-    plt.grid(True, alpha=0.3, axis='x')
-
-    # 添加数值标签
-    for i, v in enumerate(auc_scores):
-        plt.text(v + 0.01, i, f'{v:.4f}', va='center')
-
+    # 绘制多指标对比柱状图
+    fig, axes = plt.subplots(1, 3, figsize=(20, 6))
+    metrics = ['AUC', 'Accuracy', 'F1-score']
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c']
+    
+    for i, metric in enumerate(metrics):
+        sorted_items = sorted(results[metric].items(), key=lambda x: x[1], reverse=True)
+        model_names = [item[0] for item in sorted_items]
+        scores = [item[1] for item in sorted_items]
+        bar_colors = ['#1f77b4' if name == 'XGBoost' else '#7f7f7f' for name in model_names]
+        
+        sns.barplot(x=scores, y=model_names, palette=bar_colors, ax=axes[i])
+        axes[i].set_xlabel(metric, fontsize=12)
+        axes[i].set_title(f'{metric}对比', fontsize=14, fontweight='bold')
+        axes[i].set_xlim(0.5, 1.0)
+        axes[i].grid(True, alpha=0.3, axis='x')
+        
+        # 添加数值标签
+        for j, v in enumerate(scores):
+            axes[i].text(v + 0.01, j, f'{v:.4f}', va='center', fontsize=10)
+    
     plt.tight_layout()
     plt.savefig('static/images/model_comparison.png', dpi=300, bbox_inches='tight')
     plt.close()
@@ -361,7 +388,6 @@ def train_xgboost_model(X_train, y_train, X_valid, y_valid):
     """训练XGBoost模型"""
     print("正在训练XGBoost模型...")
 
-    # 设置参数
     xgb_params = {
         'eta': 0.1,
         'colsample_bytree': 0.4,
@@ -374,25 +400,28 @@ def train_xgboost_model(X_train, y_train, X_valid, y_valid):
         'booster': 'gbtree'
     }
 
-    # 创建DMatrix
     dtrain = xgb.DMatrix(X_train, label=y_train, feature_names=X_train.columns.tolist())
     dvalid = xgb.DMatrix(X_valid, label=y_valid, feature_names=X_valid.columns.tolist())
-
-    # 设置监控列表
     watchlist = [(dtrain, 'train'), (dvalid, 'valid')]
 
-    # 训练模型
+    # 添加evals_result字典记录训练过程
+    evals_result = {}
+
     model = xgb.train(
         xgb_params,
         dtrain,
         num_boost_round=4000,
         evals=watchlist,
+        evals_result=evals_result,  # 新增参数
         verbose_eval=100,
         early_stopping_rounds=100
     )
 
-    return model
+    # 绘制学习曲线
+    from xgboost_plot import plot_learning_curve
+    plot_learning_curve(evals_result)
 
+    return model
 
 def evaluate_model(model, X_train, y_train, X_valid, y_valid, X_test, y_test):
     """评估模型性能"""
